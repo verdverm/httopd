@@ -2,22 +2,17 @@
 
 set -e
 
-echo "building server"
+printf "\n\n\nbuilding server\n---------------------------\n"
 cd server
 docker build -t verdverm/dawg-server .
 cd ..
 
-# echo "building nginx"
-# cd nginx
-# docker build --no-cache -t verdverm/dawg-nginx .
-# cd ..
+printf "\n\n\nbuilding client\n---------------------------\n"
+cd client
+docker build -t verdverm/dawg-client .
+cd ..
 
-# echo "building client"
-# cd client
-# docker build -t verdverm/dawg-client .
-# cd ..
-
-# echo "building monitor"
+# printf "\n\n\nbuilding monitor\n---------------------------\n"
 # cd monitor
 # docker build -t verdverm/dawg-monitor .
 # cd ..

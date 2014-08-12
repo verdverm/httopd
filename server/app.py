@@ -19,35 +19,43 @@ def index():
     return "Yo Dawg!"
 
 @app.route('/page1')
-@app.route('/page1/<string:subpage>')
-def page1(subpage = ""):
+@app.route('/page1/<string:subpage>/<string:subsubpage>')
+def page1(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page1"
     if (subpage is not "" ):
-    	res += "/" + subpage
+        res += "/" + subpage
+    if (subsubpage is not "" ):
+    	res += "/" + subsubpage
     return res
 
 @app.route('/page2')
-@app.route('/page2/<string:subpage>')
-def page2(subpage = ""):
+@app.route('/page2/<string:subpage>/<string:subsubpage>')
+def page2(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page2"
     if (subpage is not "" ):
-    	res += "/" + subpage
+        res += "/" + subpage
+    if (subsubpage is not "" ):
+    	res += "/" + subsubpage
     return res
 
 @app.route('/page3')
-@app.route('/page3/<string:subpage>')
-def page3(subpage = ""):
+@app.route('/page3/<string:subpage>/<string:subsubpage>')
+def page3(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page3"
     if (subpage is not "" ):
-    	res += "/" + subpage
+        res += "/" + subpage
+    if (subsubpage is not "" ):
+    	res += "/" + subsubpage
     return res
 
 @app.route('/page4')
-@app.route('/page4/<string:subpage>')
-def page4(subpage = ""):
+@app.route('/page4/<string:subpage>/<string:subsubpage>')
+def page4(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page4"
     if (subpage is not "" ):
-    	res += "/" + subpage
+        res += "/" + subpage
+    if (subsubpage is not "" ):
+    	res += "/" + subsubpage
     return res
 
 

@@ -14,21 +14,14 @@ docker run -d --name dawg-server \
 	-v $curr_dir/logs:/var/log/nginx \
 	verdverm/dawg-server > /dev/null
 
-# echo "Starting nginx dawg!"
-# docker run -d --name dawg-nginx \
-# 	-p 8080:8080 \
-# 	-v $curr_dir/tmp/logs:/var/log/nginx \
-# 	verdverm/dawg-nginx > /dev/null
+echo "Starting client dawg!"
+docker run -d --name dawg-client \
+	--net host \
+	verdverm/dawg-client > /dev/null
 
-# echo "Starting nginx dawg!"
-# docker run -i -t --name dawg-nginx \
-# 	verdverm/dawg-nginx /bin/bash
-
-
-
-# echo "Starting client dawg!"
-# docker run -d --name dawg-client \
-# 	verdverm/dawg-client > dev/null
+# docker run -i -t --name dawg-client \
+# 	--net host \
+# 	verdverm/dawg-client
 
 # echo "Starting monitor dawg!"
 # docker run -i -t --name dawg-monitor \
