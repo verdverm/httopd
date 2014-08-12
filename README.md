@@ -7,25 +7,39 @@ Dependencies
 ------------
 
 1. Docker
-2. That's it
+2. *nix
 
 Running
 ------------
 
-1. `docker pull verdverm/dawg`
-2. `docker run -i -t verdverm/dawg`
+1. `git clone https://github.com/verdverm/dawg && cd dawg`
+2. `sudo build.sh`
+3. `sudo run.sh`
+
+   `sudo` is required for the docker commands
 
 Details
 ------------
 
+### Sever
 
+This docker contains a Python-Flask site.
 
+### Client
+
+This docker contains a http-client simulator.
+
+### Monitor
+
+This docker contains the CLI monitor program.
 
 
 Suggested Improvements
 ----------------------
 
-monitor multiple log files
+- monitor multiple log files when there are multiple sites / server blocks
+
+- stream logs from multiple servers to one location
 
 Problem Statement
 -----------------
