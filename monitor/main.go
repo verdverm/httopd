@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"os"
 	"time"
 
 	"github.com/go-fsnotify/fsnotify"
@@ -15,33 +15,65 @@ var (
 
 func main() {
 	flag.Parse()
+
+	startWatcher(*fn)
+
+}
+
+func startWatcher(filename string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer watcher.Close()
+
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	fi, err := os.Stat(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	last_sz := fi.Size()
 
 	go func() {
 		for {
 			select {
 			case event := <-watcher.Events:
-				log.Println("event:", event)
 				if event.Op&fsnotify.Write == fsnotify.Write {
-					log.Println("modified file:", event.Name)
+					fi, err := os.Stat(filename)
+					if err != nil {
+						panic(err)
+					}
+
+					curr_sz := fi.Size()
+					sz_chg := curr_sz - last_sz
+					fmt.Println("file change", sz_chg, curr_sz)
+
+					buf := make([]byte, sz_chg)
+					n, err := file.ReadAt(buf, last_sz)
+					if err != nil {
+						fmt.Println("readat error:", err)
+					}
+					fmt.Println(" ", n, "  ", string(buf))
+
+					last_sz = curr_sz
 				}
 			case err := <-watcher.Errors:
-				log.Println("error:", err)
+				fmt.Println("watch error:", err)
 			}
 		}
 	}()
 
-	err = watcher.Add(*fn)
+	err = watcher.Add(filename)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for {
-		fmt.Println("---")
 		time.Sleep(time.Second)
 	}
 }
