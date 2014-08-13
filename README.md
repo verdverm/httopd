@@ -3,6 +3,9 @@ httopd - top for httpd logs
 
 pronounced "hopped" like a gopher
 
+![boing!](https://raw.github.com/verdverm/httopd/master/glenda_space_medium.jpg)
+
+
 Dependencies
 ------------
 
