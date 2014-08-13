@@ -61,5 +61,5 @@ Enhancements
 References
 ---------------
 
-[Logging Control In W3C httpd - Logfile Format](http://www.w3.org/Daemon/User/Config/Logging.html#common-logfile-format)
-[termbox-go](https://github.com/nsf/termbox-go)
+1. [Logging Control In W3C httpd - Logfile Format](http://www.w3.org/Daemon/User/Config/Logging.html#common-logfile-format)
+2. [termbox-go](https://github.com/nsf/termbox-go)
