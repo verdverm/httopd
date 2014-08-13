@@ -142,8 +142,8 @@ func drawPageHits(x, y int) {
 	for _, page := range knownPages {
 		hs := siteStats.PageStats[page]
 		hist := make([]int, len(hs.HistBins))
-		for i, v := range hs.HistBins {
-			hist[i] = v.Count
+		for i := len(hs.HistBins) - 1; i >= 0; i-- {
+			hist[i] = hs.HistBins[i].Count
 		}
 
 		xcnt := x
@@ -169,9 +169,9 @@ func drawPageHits(x, y int) {
 		}
 
 		// print hit infomation
-		str = fmt.Sprintf("%5d    [", hs.Total)
-		for _, h := range hist {
-			str += fmt.Sprintf("%3d ", h)
+		str = fmt.Sprintf("%5d    [ ", hs.Total)
+		for i := len(hist) - 1; i >= 0; i-- {
+			str += fmt.Sprintf("%3d ", hist[i])
 		}
 		str += "]"
 		for _, c := range str {
