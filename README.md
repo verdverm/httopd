@@ -1,7 +1,8 @@
-Datadog Coding Challenge - Tony Worm
+httpod - top for httpd logs
 ====================================
 
-[verdverm/dawg](https://github.com/verdverm/dawg)
+[verdverm/httpod](https://github.com/verdverm/httpod)
+pronounced "hopped" like a gopher
 
 Dependencies
 ------------
@@ -12,7 +13,7 @@ Dependencies
 Running
 ------------
 
-1. `git clone https://github.com/verdverm/dawg && cd dawg`
+1. `git clone https://github.com/verdverm/httpod && cd httpod`
 2. `sudo build.sh`
 3. `sudo run.sh`
 
@@ -21,28 +22,29 @@ Running
 Details
 ------------
 
-### Sever
+### server
 
 This docker contains a Python-Flask site.
 
-### Client
+### client
 
 This docker contains a http-client simulator.
 
-### Monitor
+### httpod
 
-This docker contains the CLI monitor program.
+This docker contains the httpod program.
 
 
 Enhancements
 ----------------------
 
 - monitor multiple log files when there are multiple sites / server blocks
+
 - there are race conditions on the statistics
   - there is a single reader and a single writer
   - shouldn't be too much of an issues since only one party reads and only one party writes
 
-- weird '1' fill on some starts
+- page stats only update when new line_data shows up for that page
 
 - add history and alerts to errors
 

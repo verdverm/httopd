@@ -116,7 +116,7 @@ func checkAlerts(ld *LineData) {
 	ave := (bins[l-3].Count + bins[l-2].Count) / 2
 
 	alert := siteStats.OpenAlerts[page]
-	if alert == nil && ave > ALERT_THRESHOLD {
+	if alert == nil && ave >= ALERT_THRESHOLD {
 		// check to open a new alert
 		alert = new(PageAlert)
 		alert.Type = "High Traffic"
@@ -125,7 +125,7 @@ func checkAlerts(ld *LineData) {
 		ldTime := time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), d.Minute(), 0, time.UTC)
 		alert.BeginTime = ldTime
 		siteStats.OpenAlerts[page] = alert
-	} else if alert != nil && ave < ALERT_THRESHOLD &&
+	} else if alert != nil && ave <= ALERT_THRESHOLD &&
 		alert.BeginTime.Minute() != ld.Date.Minute() {
 		// check to close the current alert
 		d := ld.Date
