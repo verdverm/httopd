@@ -7,7 +7,6 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -15,16 +14,17 @@ var (
 	numClient   = flag.Int("c", 16, "number of client routines")
 	meanReqTime = flag.Float64("mean", 2.0, "mean time between request per client")
 	sdevReqTime = flag.Float64("sdev", 1.0, "mean time between request per client")
-	hostStr     = os.Getenv("HOSTURL")
+	hostStr     = flag.String("host", "localhost:8080", "host:port for request")
 	mean, sdev  float64
 )
 
 func main() {
 	flag.Parse()
 	rand.Seed(time.Now().UnixNano())
+
 	mean, sdev = *meanReqTime, *sdevReqTime
 
-	fmt.Println("http client simulator")
+	fmt.Println("http client simulator", *hostStr)
 
 	for i := 1; i < *numClient; i++ {
 		go run(i)
@@ -47,7 +47,7 @@ func genUrl() string {
 	// (5 is a 404 page)
 	r := rand.Int()
 	i := ((r % 9) + 2) / 2
-	url := "http://localhost:8080/page" + fmt.Sprintf("%d", i)
+	url := "http://" + *hostStr + "/page" + fmt.Sprintf("%d", i)
 	// add extra level on page
 	if r%2 == 0 {
 		url += "/asubpage"

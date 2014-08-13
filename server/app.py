@@ -1,5 +1,6 @@
 #!flask/bin/python
 from flask import Flask, make_response
+import os
 
 app = Flask(__name__)
 
@@ -62,7 +63,9 @@ def page4(subpage = "", subsubpage = ""):
     	res += "/" + subsubpage
     return res
 
+name = ""
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ['PORT'])
+    app.run(host='0.0.0.0', port=port, debug=True)
 

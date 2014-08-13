@@ -36,6 +36,8 @@ Enhancements / Issues / Todo's
 
 Want to help out? Add or remove items from the following list.
 
+- log file format
+  - multiple files / domains... how to handle?
 - monitor multiple log files when there are multiple sites / server blocks
 - there are race conditions on the statistics
   - there is a single reader and a single writer

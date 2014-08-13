@@ -23,8 +23,8 @@ RUN apt-get --no-install-recommends install -y python-setuptools build-essential
 # Install pip
 RUN easy_install pip
 
-ADD . /dawg
-WORKDIR /dawg
+ADD . /httopd
+WORKDIR /httopd
 
 # Install requirements.txt
 RUN pip install -r requirements.txt
@@ -32,4 +32,4 @@ RUN pip install -r requirements.txt
 # Expose ports.
 EXPOSE 5000 8080
 
-CMD /dawg/run.sh
+CMD /httopd/run.sh

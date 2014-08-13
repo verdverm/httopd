@@ -4,4 +4,4 @@ MAINTAINER verdverm@gmail.com
 ADD . /gopath
 WORKDIR /gopath
 
-CMD go run main.go
+CMD /gopath/run.sh

@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/go-fsnotify/fsnotify"
 )
 
 func startWatcher(filename string, out chan []byte) {
+	fmt.Println("watching: ", filename)
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		panic(err)
@@ -61,5 +65,16 @@ func startWatcher(filename string, out chan []byte) {
 		if quit == true {
 			return
 		}
+	}
+}
+
+func startWatcherList(listfile string, out chan []byte) {
+	listbytes, err := ioutil.ReadFile(listfile)
+	if err != nil {
+		panic(err)
+	}
+	lines := bytes.Fields(listbytes)
+	for _, logfile := range lines {
+		go startWatcher(string(logfile), out)
 	}
 }
