@@ -34,12 +34,19 @@ This docker contains a http-client simulator.
 This docker contains the CLI monitor program.
 
 
-Suggested Improvements
+Enhancements
 ----------------------
 
 - monitor multiple log files when there are multiple sites / server blocks
+- there are race conditions on the statistics
+  - there is a single reader and a single writer
+  - shouldn't be too much of an issues since only one party reads and only one party writes
 
-- stream logs from multiple servers to one location
+- weird '1' fill on some starts
+
+- add history and alerts to errors
+
+- ML triggers & alerts
 
 Problem Statement
 -----------------

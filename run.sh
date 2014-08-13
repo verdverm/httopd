@@ -19,10 +19,6 @@ docker run -d --name dawg-client \
 	--net host \
 	verdverm/dawg-client > /dev/null
 
-# docker run -i -t --name dawg-client \
-# 	--net host \
-# 	verdverm/dawg-client
-
 # echo "Starting monitor dawg!"
 # docker run -i -t --name dawg-monitor \
 # 	verdverm/dawg-monitor

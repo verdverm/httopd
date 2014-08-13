@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
+	"io/ioutil"
+	"runtime/debug"
 	"time"
 
-	"github.com/go-fsnotify/fsnotify"
+	"github.com/nsf/termbox-go"
 )
 
 var (
@@ -16,64 +17,30 @@ var (
 func main() {
 	flag.Parse()
 
-	startWatcher(*fn)
-
-}
-
-func startWatcher(filename string) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		panic(err)
-	}
-	defer watcher.Close()
-
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	fi, err := os.Stat(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	last_sz := fi.Size()
-
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					fi, err := os.Stat(filename)
-					if err != nil {
-						panic(err)
-					}
-
-					curr_sz := fi.Size()
-					sz_chg := curr_sz - last_sz
-					fmt.Println("file change", sz_chg, curr_sz)
-
-					buf := make([]byte, sz_chg)
-					n, err := file.ReadAt(buf, last_sz)
-					if err != nil {
-						fmt.Println("readat error:", err)
-					}
-					fmt.Println(" ", n, "  ", string(buf))
-
-					last_sz = curr_sz
-				}
-			case err := <-watcher.Errors:
-				fmt.Println("watch error:", err)
-			}
+	defer func() {
+		if e := recover(); e != nil {
+			termbox.Close()
+			trace := fmt.Sprintf("%s: %s", e, debug.Stack()) // line 20
+			ioutil.WriteFile("trace.txt", []byte(trace), 0644)
 		}
 	}()
 
-	err = watcher.Add(filename)
-	if err != nil {
-		panic(err)
-	}
+	line_chan := make(chan []byte, 16)
+	data_chan := make(chan *LineData, 16)
+
+	go startWatcher(*fn, line_chan)
+	go startParser(line_chan, data_chan)
+	go startStats(data_chan)
+	go startCLI() // streams CLI commands to the main loop
 
 	for {
-		time.Sleep(time.Second)
+		// select {}
+		time.Sleep(time.Millisecond * 100)
+
+		if quit == true {
+			break
+		}
 	}
+
+	termbox.Close()
 }

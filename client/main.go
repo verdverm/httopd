@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	numClient   = flag.Int("c", 4, "number of client routines")
-	meanReqTime = flag.Float64("mean", 3.0, "mean time between request per client")
+	numClient   = flag.Int("c", 16, "number of client routines")
+	meanReqTime = flag.Float64("mean", 2.0, "mean time between request per client")
 	sdevReqTime = flag.Float64("sdev", 1.0, "mean time between request per client")
 	hostStr     = os.Getenv("HOSTURL")
 	mean, sdev  float64

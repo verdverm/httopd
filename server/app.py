@@ -19,6 +19,7 @@ def index():
     return "Yo Dawg!"
 
 @app.route('/page1')
+@app.route('/page1/<string:subpage>')
 @app.route('/page1/<string:subpage>/<string:subsubpage>')
 def page1(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page1"
@@ -29,6 +30,7 @@ def page1(subpage = "", subsubpage = ""):
     return res
 
 @app.route('/page2')
+@app.route('/page2/<string:subpage>')
 @app.route('/page2/<string:subpage>/<string:subsubpage>')
 def page2(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page2"
@@ -39,6 +41,7 @@ def page2(subpage = "", subsubpage = ""):
     return res
 
 @app.route('/page3')
+@app.route('/page3/<string:subpage>')
 @app.route('/page3/<string:subpage>/<string:subsubpage>')
 def page3(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page3"
@@ -49,6 +52,7 @@ def page3(subpage = "", subsubpage = ""):
     return res
 
 @app.route('/page4')
+@app.route('/page4/<string:subpage>')
 @app.route('/page4/<string:subpage>/<string:subsubpage>')
 def page4(subpage = "", subsubpage = ""):
     res = "Yo Dawg! You found page4"
