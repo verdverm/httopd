@@ -14,36 +14,24 @@ Installation
 -------------
 `go get github.com/verdverm/httopd/httopd`
 
+Running
+-----------
+`httopd -fn="/abs/path/to/log/file"`
+
+
 Running Simulator
 ------------
 
 1. `git clone https://github.com/verdverm/httopd && cd httopd`
 2. `sudo build.sh`
 3. `sudo run.sh`
-4. `cd httopd`
-5. `go build`
-6. `httopd -fn="/abs/path/to/log/file"`
 
    `sudo` is required for the docker commands (unless you run a non-sudo docker setup)
 
-Details
-------------
-
-### server
-
-This docker contains a Python-Flask site.
-
-### client
-
-This docker contains a http-client simulator.
-
-### httpod
-
-This docker contains the httpod program.
-
-
 Enhancements / Issues / Todo's
-----------------------
+------------------------------
+
+Want to help out? Add or remove items from the following list.
 
 - monitor multiple log files when there are multiple sites / server blocks
 - there are race conditions on the statistics
@@ -56,6 +44,29 @@ Enhancements / Issues / Todo's
 - config file or directory inspection for log files / log directories
 - ML triggers & alerts
 - more configurable triggers / set from CLI / save to file?
+- better log line parser
+  - simpler and more flexible
+  - only tested with nginx, need to check apache and others
+
+
+Subdir Details
+------------
+
+#### server
+
+This docker contains a Python-Flask site.
+
+#### client
+
+This docker contains a http-client simulator.
+
+#### httpod
+
+This docker contains the httpod program.
+
+#### logs
+
+a temporary directory created and destroyed by the simulator
 
 References
 ---------------
