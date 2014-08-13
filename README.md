@@ -1,7 +1,6 @@
 httopd - top for httpd logs
 ====================================
 
-[verdverm/httpod](https://github.com/verdverm/httpod)
 pronounced "hopped" like a gopher
 
 Dependencies
