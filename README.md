@@ -19,14 +19,15 @@ Running
 `httopd -fn="/abs/path/to/log/file"`
 
 
-Running Simulator
+Simulator
 ------------
 
 1. `git clone https://github.com/verdverm/httopd && cd httopd`
 2. `sudo build.sh`
 3. `sudo run.sh`
 
-   `sudo` is required for the docker commands (unless you run a non-sudo docker setup)
+
+`sudo` is required for the docker commands (unless you run a non-sudo docker setup)
 
 Enhancements / Issues / Todo's
 ------------------------------
