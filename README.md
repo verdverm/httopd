@@ -18,7 +18,19 @@ Installation
 
 Running
 -----------
+
+watching a single log file
 `httopd -fn="/abs/path/to/log/file"`
+
+watching a list of log files
+`httopd -fnList="path/to/list/file"`
+
+list file format
+```
+/abs/path/to/log/access.log
+/abs/path/to/site/log/access.log
+/abs/path/to/site/log/access.log
+```
 
 
 Simulator
@@ -38,6 +50,9 @@ Want to help out? Add or remove items from the following list.
 
 - log file format
   - multiple files / domains... how to handle?
+  - only handling access.log default from nginx
+  - what about error.log ?
+  - other log providers ?
 - monitor multiple log files when there are multiple sites / server blocks
 - there are race conditions on the statistics
   - there is a single reader and a single writer
@@ -67,7 +82,7 @@ This docker contains a http-client simulator.
 
 #### httpod
 
-This docker contains the httpod program.
+This folder contains the httpod program code.
 
 #### logs
 
