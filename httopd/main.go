@@ -7,6 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	// "github.com/go-fsnotify/fsnotify"
 	"github.com/nsf/termbox-go"
 )
 
@@ -26,7 +27,13 @@ func main() {
 		}
 	}()
 
-	line_chan := make(chan []byte, 64)
+	// var err error
+	// watcher, err = fsnotify.NewWatcher()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer watcher.Close()
+	line_chan := make(chan *LineRaw, 64)
 	data_chan := make(chan *LineData, 64)
 
 	if *fnList != "" {
@@ -60,5 +67,5 @@ func main() {
 		}
 	}
 
-	ermbox.Close()
+	termbox.Close()
 }

@@ -17,19 +17,23 @@ func init() {
 
 var w, h int
 
+var tmpLogFn = "/home/tony/gocode/src/github.com/verdverm/httopd/logs/host.httopd-1.access.log"
+
 func redraw_all() {
 	termbox.Clear(coldef, coldef)
 	w, h = termbox.Size()
 
 	drawCurrentTime(1, 0)
 
-	drawRetCodes(1, 2)
+	ss := siteStats.Logs[tmpLogFn]
+
+	drawRetCodes(1, 2, ss)
 	drawErrStats(30, 2)
 
 	if alertDetailsView {
-		drawAlertDetails(1, 7)
+		drawAlertDetails(1, 7, ss)
 	} else {
-		drawPageStats(1, 7)
+		drawPageStats(1, 7, ss)
 	}
 
 	drawFooter()
@@ -96,7 +100,7 @@ var knownCodes = []string{
 	"404",
 }
 
-func drawRetCodes(x, y int) {
+func drawRetCodes(x, y int, ss *SiteStats) {
 	colTitle := "Code      Count"
 	for i, c := range colTitle {
 		termbox.SetCell(x+i, y, c, coldef, coldef)
@@ -105,8 +109,8 @@ func drawRetCodes(x, y int) {
 
 	total := 0
 	for _, code := range knownCodes {
-		total += siteStats.RetCodes[code]
-		errStr := fmt.Sprintf("%-8s  %5d", code, siteStats.RetCodes[code])
+		total += ss.RetCodes[code]
+		errStr := fmt.Sprintf("%-8s  %5d", code, ss.RetCodes[code])
 		for i, c := range errStr {
 			termbox.SetCell(x+i, y, c, coldef, coldef)
 		}
@@ -129,7 +133,7 @@ var knownPages = []string{
 var selectedRow = 0
 var maxSelectedRow = len(knownPages) - 1
 
-func drawPageStats(x, y int) {
+func drawPageStats(x, y int, ss *SiteStats) {
 	colTitle := "Page     Alerts  Count    Hits / min"
 
 	for i := 0; i < w; i++ {
@@ -145,7 +149,7 @@ func drawPageStats(x, y int) {
 	}
 
 	for p, page := range knownPages {
-		hs := siteStats.PageStats[page]
+		hs := ss.PageStats[page]
 		hist := make([]int, len(hs.HistBins))
 		for i := len(hs.HistBins) - 1; i >= 0; i-- {
 			hist[i] = hs.HistBins[i].Count
@@ -170,11 +174,11 @@ func drawPageStats(x, y int) {
 		}
 
 		// print alerts
-		alerts := siteStats.AlertHist[page]
+		alerts := ss.AlertHist[page]
 		alertCount := len(alerts)
 		alert_fg := fg_col
 		alert_bg := bg_col
-		if a := siteStats.OpenAlerts[page]; a != nil {
+		if a := ss.OpenAlerts[page]; a != nil {
 			alert_fg = termbox.ColorDefault
 			alert_bg = termbox.ColorRed
 			alertCount++
@@ -203,7 +207,7 @@ func drawPageStats(x, y int) {
 
 const alertDateFormat = "01-02 15:04"
 
-func drawAlertDetails(x, y int) {
+func drawAlertDetails(x, y int, ss *SiteStats) {
 	colTitle := "Type           Start          End            Details"
 	for i := 0; i < w; i++ {
 		termbox.SetCell(i, y, ' ', coldef, termbox.ColorCyan)
@@ -219,7 +223,7 @@ func drawAlertDetails(x, y int) {
 
 	fg_col, bg_col := coldef, coldef
 
-	if alert := siteStats.OpenAlerts[alertPage]; alert != nil {
+	if alert := ss.OpenAlerts[alertPage]; alert != nil {
 		bstr, estr := alert.BeginTime.Format(alertDateFormat), "  "
 		if alert.BeginTime.Before(alert.EndTime) {
 			estr = alert.EndTime.Format(alertDateFormat)
@@ -231,10 +235,10 @@ func drawAlertDetails(x, y int) {
 		y++
 	}
 
-	alerts := siteStats.AlertHist[alertPage]
+	alerts := ss.AlertHist[alertPage]
 	for P := len(alerts) - 1; P >= 0; P-- {
 		alert := alerts[P]
-		hs := siteStats.PageStats[alertPage]
+		hs := ss.PageStats[alertPage]
 		hist := make([]int, len(hs.HistBins))
 		for i := len(hs.HistBins) - 1; i >= 0; i-- {
 			hist[i] = hs.HistBins[i].Count

@@ -8,9 +8,21 @@ import (
 type Recorder func(*HistStats, *LineData)
 type Trigger func(*HistStats) bool
 
+// main "DS"
+type MainDS struct {
+	Logs     map[string]*SiteStats
+	ErrStats map[string]int
+}
+
+var siteStats MainDS
+
+func init() {
+	siteStats.Logs = make(map[string]*SiteStats)
+	siteStats.ErrStats = make(map[string]int)
+}
+
 type SiteStats struct {
 	// use PageStats here to avoid duplication of history data stuct
-	ErrStats   map[string]int
 	RetCodes   map[string]int
 	PageStats  map[string]HistStats
 	PageErrors map[string]HistStats
@@ -26,6 +38,7 @@ var (
 
 type HistBin struct {
 	Start time.Time
+	Bytes int
 	Count int
 }
 
@@ -43,15 +56,18 @@ type PageAlert struct {
 	EndTime   time.Time
 }
 
-var siteStats SiteStats
+// called in startWatcher
+func initSiteStats(logfn string) {
+	ss := new(SiteStats)
 
-func init() {
-	siteStats.ErrStats = make(map[string]int)
-	siteStats.RetCodes = make(map[string]int)
+	// not thread safe
+	siteStats.Logs[logfn] = ss
 
-	siteStats.PageStats = make(map[string]HistStats)
-	siteStats.AlertHist = make(map[string][]*PageAlert)
-	siteStats.OpenAlerts = make(map[string]*PageAlert)
+	ss.RetCodes = make(map[string]int)
+
+	ss.PageStats = make(map[string]HistStats)
+	ss.AlertHist = make(map[string][]*PageAlert)
+	ss.OpenAlerts = make(map[string]*PageAlert)
 }
 
 const ALERT_THRESHOLD = 105
@@ -76,9 +92,10 @@ func startStats(data_chan chan *LineData) {
 func updateStats(ld *LineData) {
 	code := ld.Status
 	page := ld.SectionStr
-	siteStats.RetCodes[code]++
+	logfn := ld.Logfile
+	siteStats.Logs[logfn].RetCodes[code]++
 
-	hs := siteStats.PageStats[page]
+	hs := siteStats.Logs[logfn].PageStats[page]
 	hs.Total++
 	if hs.LastTime.Minute() != ld.Date.Minute() {
 		// time for new bin
@@ -97,13 +114,16 @@ func updateStats(ld *LineData) {
 		// continue with current bin
 		l := len(hs.HistBins) - 1
 		hs.HistBins[l].Count++
+		hs.HistBins[l].Bytes += ld.ContentLen
 	}
-	siteStats.PageStats[page] = hs
+	siteStats.Logs[logfn].PageStats[page] = hs
 }
 
 func checkAlerts(ld *LineData) {
 	page := ld.SectionStr
-	hs := siteStats.PageStats[page]
+	logfn := ld.Logfile
+
+	hs := siteStats.Logs[logfn].PageStats[page]
 	bins := hs.HistBins
 	l := len(bins)
 
@@ -115,7 +135,7 @@ func checkAlerts(ld *LineData) {
 	// calc trigger for last two COMPLETE minutes
 	ave := (bins[l-3].Count + bins[l-2].Count) / 2
 
-	alert := siteStats.OpenAlerts[page]
+	alert := siteStats.Logs[logfn].OpenAlerts[page]
 	if alert == nil && ave >= ALERT_THRESHOLD {
 		// check to open a new alert
 		alert = new(PageAlert)
@@ -124,17 +144,17 @@ func checkAlerts(ld *LineData) {
 		d := ld.Date
 		ldTime := time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), d.Minute(), 0, time.UTC)
 		alert.BeginTime = ldTime
-		siteStats.OpenAlerts[page] = alert
+		siteStats.Logs[logfn].OpenAlerts[page] = alert
 	} else if alert != nil && ave <= ALERT_THRESHOLD &&
 		alert.BeginTime.Minute() != ld.Date.Minute() {
 		// check to close the current alert
 		d := ld.Date
 		ldTime := time.Date(d.Year(), d.Month(), d.Day(), d.Hour(), d.Minute(), d.Minute(), 0, time.UTC)
 		alert.EndTime = ldTime
-		alerts := siteStats.AlertHist[page]
+		alerts := siteStats.Logs[logfn].AlertHist[page]
 		alerts = append(alerts, alert)
-		siteStats.AlertHist[page] = alerts
-		siteStats.OpenAlerts[page] = nil
+		siteStats.Logs[logfn].AlertHist[page] = alerts
+		siteStats.Logs[logfn].OpenAlerts[page] = nil
 	}
 
 }
