@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/nsf/termbox-go"
@@ -38,13 +39,15 @@ func redraw_all() {
 	drawCurrentTime(1, 0)
 
 	// temporary, this is changing
-	ss := siteStats.Logs[tmpLogFn]
-
-	drawRetCodes(1, 2, ss)
+	drawRetCodes(1, 2)
 	drawErrStats(30, 2)
 
+	// convert to 'detailsView'
 	if alertDetailsView {
-		drawAlertDetails(1, 7, ss)
+		drawAlertDetails(1, 7)
+		// draw page details (more detailed stats & alert hist)
+		// or
+		// draw logfile details (aggregates of the page details)
 	} else {
 		drawColumnHeaders(1, colHeaderRow)
 		y := colHeaderRow + 1
@@ -93,7 +96,7 @@ func drawCurrentTime(x, y int) {
 	h := int(since.Hours())
 	m := int(since.Minutes()) % 60
 	s := int(since.Seconds()) % 60
-	timeStr := fmt.Sprintf("Now:  %-16s  Watching:  %3d:%02d:%02d", now.Format(DATEPRINT), h, m, s)
+	timeStr := fmt.Sprintf("Now:  %-24s  Watching:  %3d:%02d:%02d", now.Format(DATEPRINT), h, m, s)
 	for i, c := range timeStr {
 		termbox.SetCell(x+i, y, c, coldef, coldef)
 	}
@@ -125,7 +128,10 @@ var knownCodes = []string{
 	"404",
 }
 
-func drawRetCodes(x, y int, ss *SiteStats) {
+func drawRetCodes(x, y int) {
+	// temporary, want to calc global here
+	ss := siteStats.Logs[tmpLogFn]
+
 	colTitle := "Code      Count"
 	for i, c := range colTitle {
 		termbox.SetCell(x+i, y, c, coldef, coldef)
@@ -150,15 +156,15 @@ func drawRetCodes(x, y int, ss *SiteStats) {
 
 func drawColumnHeaders(x, y int) {
 	columnHeaders := fmt.Sprintf(
-		"%-4s  %-16s  %-6s  %-6s    %-48s",
+		"%-4s  %-24s  %-6s   %-6s   %-48s",
 		"CID", "Page", "Alerts", "Count", "Hits / min",
 	)
 
 	for i := 0; i < w; i++ {
-		termbox.SetCell(i, y, ' ', coldef, termbox.ColorCyan)
+		termbox.SetCell(i, y, ' ', coldef, termbox.ColorBlue)
 	}
 	for i, c := range columnHeaders {
-		termbox.SetCell(x+i, y, c, coldef, termbox.ColorCyan)
+		termbox.SetCell(x+i, y, c, coldef, termbox.ColorBlue)
 	}
 }
 func drawPageStats(x, y int, ss *SiteStats) {
@@ -176,7 +182,9 @@ func drawPageStats(x, y int, ss *SiteStats) {
 	}
 
 	// print log file name
-	str := fmt.Sprintf("%-4d  %-16s  ", y, ss.LogName)
+	lpos := strings.LastIndex(ss.LogName, "/") + 1
+	lfn_short := ss.LogName[lpos:]
+	str := fmt.Sprintf("%-4d  %-24s  ", y, lfn_short)
 	for i := 0; i < w; i++ {
 		termbox.SetCell(i, y, ' ', fg_col, bg_col)
 	}
@@ -204,8 +212,7 @@ func drawPageStats(x, y int, ss *SiteStats) {
 		}
 
 		// print page name
-		lfn_short := ss.LogName[len(ss.LogName)-13:]
-		str := fmt.Sprintf("%-4d  %-16s  ", y, page+lfn_short)
+		str := fmt.Sprintf("%-4d  %-24s  ", y, page)
 		for i := 0; i < w; i++ {
 			termbox.SetCell(i, y, ' ', fg_col, bg_col)
 		}
@@ -248,13 +255,19 @@ func drawPageStats(x, y int, ss *SiteStats) {
 
 const alertDateFormat = "01-02 15:04"
 
-func drawAlertDetails(x, y int, ss *SiteStats) {
+func drawAlertDetails(x, y int) {
+	// determine details to draw
+	alertPage = fmt.Sprintf("page%d", selectedRow+1)
+
+	ss := siteStats.Logs[tmpLogFn]
+
+	// draw the details
 	colTitle := "Type           Start          End            Details"
 	for i := 0; i < w; i++ {
-		termbox.SetCell(i, y, ' ', coldef, termbox.ColorCyan)
+		termbox.SetCell(i, y, ' ', coldef, termbox.ColorBlue)
 	}
 	for i, c := range colTitle {
-		termbox.SetCell(x+i, y, c, coldef, termbox.ColorCyan)
+		termbox.SetCell(x+i, y, c, coldef, termbox.ColorBlue)
 	}
 	y++
 
@@ -300,14 +313,10 @@ func drawAlertDetails(x, y int, ss *SiteStats) {
 func drawFooter() {
 	footerText := " Esc:Back   Ctrl-Q:Quit   Enter:Detail" //"<_sort_> "
 	for i := 0; i < w; i++ {
-		termbox.SetCell(i, h-1, ' ', coldef, termbox.ColorCyan)
+		termbox.SetCell(i, h-1, ' ', coldef, termbox.ColorBlue)
 	}
 	for i, c := range footerText {
-		col := termbox.ColorCyan
-		if c != ' ' {
-			col = termbox.ColorBlue
-		}
-		termbox.SetCell(i, h-1, c, coldef, col)
+		termbox.SetCell(i, h-1, c, coldef, termbox.ColorBlue)
 	}
 
 }

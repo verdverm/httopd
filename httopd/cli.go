@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"time"
 
 	"github.com/nsf/termbox-go"
@@ -51,7 +51,8 @@ func handleEvents(eventChan chan termbox.Event) {
 
 			case termbox.KeyEnter:
 				alertDetailsView = true
-				alertPage = fmt.Sprintf("page%d", selectedRow+1)
+				// FIX THIS
+				// alertPage = fmt.Sprintf("page%d", selectedRow+1)
 
 			case termbox.KeyArrowDown:
 				// if alertDetailsView {

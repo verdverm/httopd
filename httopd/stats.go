@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const ALERT_THRESHOLD = 35
+
 type Recorder func(*HistStats, *LineData)
 type Trigger func(*HistStats) bool
 
@@ -76,8 +78,6 @@ type PageAlert struct {
 	BeginTime time.Time
 	EndTime   time.Time
 }
-
-const ALERT_THRESHOLD = 105
 
 func startStats(data_chan chan *LineData) {
 

@@ -49,14 +49,14 @@ Enhancements / Issues / Todo's
 Want to help out? Add or remove items from the following list.
 
 - log file format
-  - multiple files / domains... how to handle?
-  - only handling access.log default from nginx
-  - what about error.log ?
-  - other log providers ?
+  -- multiple files / domains... how to handle?
+  -- only handling access.log default from nginx
+  -- what about error.log ?
+  -- other log providers ?
 - monitor multiple log files when there are multiple sites / server blocks
 - there are race conditions on the statistics
-  - there is a single reader and a single writer
-  - shouldn't be too much of an issues since only one party reads and only one party writes
+  -- there is a single reader and a single writer
+  -- shouldn't be too much of an issues since only one party reads and only one party writes
 - page stats only update when new line_data shows up for that page
 - add history and alerts to errors
 - backfill with 10 minutes of history on startup
@@ -65,9 +65,11 @@ Want to help out? Add or remove items from the following list.
 - ML triggers & alerts
 - more configurable triggers / set from CLI / save to file?
 - better log line parser
-  - simpler and more flexible
-  - only tested with nginx, need to check apache and others
-
+  -- simpler and more flexible
+  -- only tested with nginx, need to check apache and others
+- stats should be kept in something like an R data frame
+  -- so that aggregates can be calculated more easily
+  -- can rely on an external library for stats calculations
 
 Subdir Details
 ------------
