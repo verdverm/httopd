@@ -14,8 +14,6 @@ var watcher *fsnotify.Watcher
 // setup and defferd closing in main()
 
 func startWatcher(filename string, out chan *LineRaw) {
-	fmt.Println("watching: ", filename)
-
 	// file stuff
 	file, err := os.Open(filename)
 	if err != nil {
@@ -91,7 +89,8 @@ func startWatcherList(listfile string, out chan *LineRaw) {
 	lines := bytes.Fields(listbytes)
 	for _, logfile := range lines {
 		filename := string(logfile)
-		initSiteStats(filename)
+		fmt.Println("  watching: ", filename)
+		addSiteStats(filename)
 		go startWatcher(filename, out)
 	}
 }

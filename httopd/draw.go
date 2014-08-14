@@ -19,12 +19,25 @@ var w, h int
 
 var tmpLogFn = "/home/tony/gocode/src/github.com/verdverm/httopd/logs/host.httopd-1.access.log"
 
+var knownPages = []string{
+	"page1",
+	"page2",
+	"page3",
+	"page4",
+}
+
+var selectedRow = 0
+var colHeaderRow = 7
+var minSelectedRow = colHeaderRow + 1
+var maxSelectedRow = colHeaderRow + 1
+
 func redraw_all() {
 	termbox.Clear(coldef, coldef)
 	w, h = termbox.Size()
 
 	drawCurrentTime(1, 0)
 
+	// temporary, this is changing
 	ss := siteStats.Logs[tmpLogFn]
 
 	drawRetCodes(1, 2, ss)
@@ -33,7 +46,14 @@ func redraw_all() {
 	if alertDetailsView {
 		drawAlertDetails(1, 7, ss)
 	} else {
-		drawPageStats(1, 7, ss)
+		drawColumnHeaders(1, colHeaderRow)
+		y := colHeaderRow + 1
+		for _, f := range siteStats.LogNames {
+			ss := siteStats.Logs[f]
+			drawPageStats(1, y, ss)
+			y += len(ss.PageStats)
+		}
+		maxSelectedRow = y - 1
 	}
 
 	drawFooter()
@@ -93,6 +113,11 @@ func drawErrStats(x, y int) {
 		}
 		y++
 	}
+	selRow := fmt.Sprintf("%-8s  %5d  %5d  %5d", "selRow", selectedRow, minSelectedRow, maxSelectedRow)
+	for i, c := range selRow {
+		termbox.SetCell(x+i, y, c, coldef, coldef)
+	}
+
 }
 
 var knownCodes = []string{
@@ -123,32 +148,47 @@ func drawRetCodes(x, y int, ss *SiteStats) {
 	}
 }
 
-var knownPages = []string{
-	"page1",
-	"page2",
-	"page3",
-	"page4",
-}
-
-var selectedRow = 0
-var maxSelectedRow = len(knownPages) - 1
-
-func drawPageStats(x, y int, ss *SiteStats) {
-	colTitle := "Page     Alerts  Count    Hits / min"
+func drawColumnHeaders(x, y int) {
+	columnHeaders := fmt.Sprintf(
+		"%-4s  %-16s  %-6s  %-6s    %-48s",
+		"CID", "Page", "Alerts", "Count", "Hits / min",
+	)
 
 	for i := 0; i < w; i++ {
 		termbox.SetCell(i, y, ' ', coldef, termbox.ColorCyan)
 	}
-	for i, c := range colTitle {
+	for i, c := range columnHeaders {
 		termbox.SetCell(x+i, y, c, coldef, termbox.ColorCyan)
+	}
+}
+func drawPageStats(x, y int, ss *SiteStats) {
+
+	if selectedRow < minSelectedRow {
+		selectedRow = minSelectedRow
+	}
+
+	// draw log row
+
+	fg_col, bg_col := coldef, coldef
+	if y == selectedRow {
+		fg_col = termbox.ColorBlack
+		bg_col = termbox.ColorYellow
+	}
+
+	// print log file name
+	str := fmt.Sprintf("%-4d  %-16s  ", y, ss.LogName)
+	for i := 0; i < w; i++ {
+		termbox.SetCell(i, y, ' ', fg_col, bg_col)
+	}
+	xcnt := x
+	for _, c := range str {
+		termbox.SetCell(xcnt, y, c, fg_col, bg_col)
+		xcnt++
 	}
 	y++
 
-	if selectedRow < 0 {
-		selectedRow = 0
-	}
-
-	for p, page := range knownPages {
+	// draw page sections
+	for _, page := range knownPages {
 		hs := ss.PageStats[page]
 		hist := make([]int, len(hs.HistBins))
 		for i := len(hs.HistBins) - 1; i >= 0; i-- {
@@ -157,14 +197,15 @@ func drawPageStats(x, y int, ss *SiteStats) {
 
 		xcnt := x
 
-		fg_col, bg_col := coldef, coldef
-		if p == selectedRow {
+		fg_col, bg_col = coldef, coldef
+		if y == selectedRow {
 			fg_col = termbox.ColorBlack
 			bg_col = termbox.ColorYellow
 		}
 
 		// print page name
-		str := fmt.Sprintf("%-8s  ", page)
+		lfn_short := ss.LogName[len(ss.LogName)-13:]
+		str := fmt.Sprintf("%-4d  %-16s  ", y, page+lfn_short)
 		for i := 0; i < w; i++ {
 			termbox.SetCell(i, y, ' ', fg_col, bg_col)
 		}
@@ -183,14 +224,14 @@ func drawPageStats(x, y int, ss *SiteStats) {
 			alert_bg = termbox.ColorRed
 			alertCount++
 		}
-		str = fmt.Sprintf("%5d  ", alertCount)
+		str = fmt.Sprintf("%6d  ", alertCount)
 		for _, c := range str {
 			termbox.SetCell(xcnt, y, c, alert_fg, alert_bg)
 			xcnt++
 		}
 
 		// print hit infomation
-		str = fmt.Sprintf("%5d    [ ", hs.Total)
+		str = fmt.Sprintf("%6d    [ ", hs.Total)
 		for i := len(hist) - 1; i >= 0; i-- {
 			str += fmt.Sprintf("%3d ", hist[i])
 		}

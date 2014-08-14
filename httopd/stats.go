@@ -10,8 +10,12 @@ type Trigger func(*HistStats) bool
 
 // main "DS"
 type MainDS struct {
+	LogNames []string
 	Logs     map[string]*SiteStats
 	ErrStats map[string]int
+
+	// this alerts is not in use, but is planned to move all alerts here
+	AlertHist map[string][]*PageAlert
 }
 
 var siteStats MainDS
@@ -22,6 +26,7 @@ func init() {
 }
 
 type SiteStats struct {
+	LogName string
 	// use PageStats here to avoid duplication of history data stuct
 	RetCodes   map[string]int
 	PageStats  map[string]HistStats
@@ -29,6 +34,22 @@ type SiteStats struct {
 
 	OpenAlerts map[string]*PageAlert
 	AlertHist  map[string][]*PageAlert
+}
+
+// called in startWatcher
+func addSiteStats(logfn string) {
+	ss := new(SiteStats)
+	ss.LogName = logfn
+
+	// not thread safe
+	siteStats.LogNames = append(siteStats.LogNames, logfn)
+	siteStats.Logs[logfn] = ss
+
+	ss.RetCodes = make(map[string]int)
+
+	ss.PageStats = make(map[string]HistStats)
+	ss.AlertHist = make(map[string][]*PageAlert)
+	ss.OpenAlerts = make(map[string]*PageAlert)
 }
 
 var (
@@ -54,20 +75,6 @@ type PageAlert struct {
 
 	BeginTime time.Time
 	EndTime   time.Time
-}
-
-// called in startWatcher
-func initSiteStats(logfn string) {
-	ss := new(SiteStats)
-
-	// not thread safe
-	siteStats.Logs[logfn] = ss
-
-	ss.RetCodes = make(map[string]int)
-
-	ss.PageStats = make(map[string]HistStats)
-	ss.AlertHist = make(map[string][]*PageAlert)
-	ss.OpenAlerts = make(map[string]*PageAlert)
 }
 
 const ALERT_THRESHOLD = 105
