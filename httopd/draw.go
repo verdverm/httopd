@@ -44,7 +44,11 @@ func redraw_all() {
 
 	// convert to 'detailsView'
 	if alertDetailsView {
-		drawAlertDetails(1, 7)
+		// determine details to draw
+		alertPage = "page1"
+		ss := siteStats.Logs[tmpLogFn]
+
+		drawSectionDetails(1, 7, alertPage, ss)
 		// draw page details (more detailed stats & alert hist)
 		// or
 		// draw logfile details (aggregates of the page details)
@@ -212,7 +216,7 @@ func drawPageStats(x, y int, ss *SiteStats) {
 		}
 
 		// print page name
-		str := fmt.Sprintf("%-4d  %-24s  ", y, page)
+		str := fmt.Sprintf("%-4d  %-24s  ", y, "  "+page)
 		for i := 0; i < w; i++ {
 			termbox.SetCell(i, y, ' ', fg_col, bg_col)
 		}
@@ -255,11 +259,7 @@ func drawPageStats(x, y int, ss *SiteStats) {
 
 const alertDateFormat = "01-02 15:04"
 
-func drawAlertDetails(x, y int) {
-	// determine details to draw
-	alertPage = fmt.Sprintf("page%d", selectedRow+1)
-
-	ss := siteStats.Logs[tmpLogFn]
+func drawSectionDetails(x, y int, alertsPage string, ss *SiteStats) {
 
 	// draw the details
 	colTitle := "Type           Start          End            Details"

@@ -70,6 +70,13 @@ Want to help out? Add or remove items from the following list.
 - stats should be kept in something like an R data frame
   -- so that aggregates can be calculated more easily
   -- can rely on an external library for stats calculations
+- there may be some errors now resulting from multiple log files
+  -- multiple watchers are firing linedata to the stats over channels
+  -- if they arrive in a 'bad' order (reverse alternations over a minute boundary)
+  -- we will switch bins, but the next arrival (last minute) will end up in the current bin, not the last one
+  -- should really determine the bin by the time stamp, and then index to it
+  -- right now we are just adding to the current bin
+  -- this will be an issue with backfilling, which once resolved, we can backfile file by file, and not worry about time
 
 Subdir Details
 ------------
